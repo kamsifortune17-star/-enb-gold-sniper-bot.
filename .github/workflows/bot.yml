@@ -2,11 +2,16 @@ name: ENB Gold Sniper
 
 'on':
   workflow_dispatch:
+
   push:
     branches:
       - main
+    paths:
+      - 'bot.py'
+      - '.github/workflows/bot.yml'
+
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: '2-59/5 * * * *'
 
 permissions:
   contents: write
@@ -28,20 +33,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests yfinance
 
       - name: Run ENB Gold Sniper
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
         run: python bot.py
 
       - name: Save signal state
-        if: always()
+        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
