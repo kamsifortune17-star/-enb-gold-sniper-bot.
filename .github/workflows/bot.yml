@@ -1,45 +1,48 @@
 name: ENB Gold Sniper
 
-‘on’:
-workflow_dispatch:
-schedule:
-- cron: “*/5 * * * *”
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
 
 permissions:
-contents: write
+  contents: write
 
 concurrency:
-group: enb-gold-sniper
-cancel-in-progress: false
+  group: enb-gold-sniper
+  cancel-in-progress: false
 
 jobs:
-run-bot:
-runs-on: ubuntu-latest
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
-    with:
-      ref: main
-  - name: Set up Python
-    uses: actions/setup-python@v5
-    with:
-      python-version: "3.12"
-  - name: Install dependencies
-    run: pip install requests
-  - name: Run ENB Gold Sniper
-    env:
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-    run: python bot.py
-  - name: Save signal state
-    if: always()
-    run: |
-      git config user.name "github-actions[bot]"
-      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      git add -f state.json
-      if ! git diff --cached --quiet; then
-        git commit -m "Update ENB signal state"
-        git push origin HEAD:main
-      fi
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run ENB Gold Sniper
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python bot.py
+
+      - name: Save signal state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f state.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update ENB signal state"
+            git push origin HEAD:main
+          fi
