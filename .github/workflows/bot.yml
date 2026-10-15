@@ -1,6 +1,6 @@
 name: ENB Gold Sniper
 
-on:
+‘on’:
 workflow_dispatch:
 schedule:
 - cron: “*/5 * * * *”
